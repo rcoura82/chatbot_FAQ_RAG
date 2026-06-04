@@ -203,9 +203,16 @@ class TemplateGenerator:
 
 class HuggingFaceGenerator:
     def __init__(self, model_name: str) -> None:
-        from transformers import pipeline  # type: ignore
+        try:
+            from transformers import pipeline  # type: ignore
 
-        self._pipeline = pipeline("text2text-generation", model=model_name, tokenizer=model_name)
+            self._pipeline = pipeline(
+                "text2text-generation", model=model_name, tokenizer=model_name
+            )
+        except (ImportError, OSError, RuntimeError, ValueError) as error:
+            raise RuntimeError(
+                f"Não foi possível carregar o modelo de geração '{model_name}'."
+            ) from error
 
     def generate(self, question: str, contexts: Sequence[RetrievedChunk]) -> str:
         if not contexts:
@@ -264,7 +271,9 @@ class FAQRAGChatbot:
     def _filter_contexts(contexts: Sequence[RetrievedChunk]) -> list[RetrievedChunk]:
         if not contexts:
             return []
-        if len(contexts) == 1 or contexts[0].score <= MIN_VALID_SCORE:
+        if len(contexts) == 1:
+            return list(contexts)
+        if contexts[0].score <= MIN_VALID_SCORE:
             return list(contexts)
         threshold = contexts[0].score * SIMILARITY_THRESHOLD_RATIO
         filtered_contexts = [chunk for chunk in contexts if chunk.score >= threshold]
@@ -319,7 +328,10 @@ def interactive_chat(chatbot: FAQRAGChatbot, top_k: int) -> None:
 def main(argv: Iterable[str] | None = None) -> int:
     parser = build_argument_parser()
     args = parser.parse_args(list(argv) if argv is not None else None)
-    chatbot = FAQRAGChatbot(corpus_dir=args.corpus_dir, history_path=args.history_file)
+    try:
+        chatbot = FAQRAGChatbot(corpus_dir=args.corpus_dir, history_path=args.history_file)
+    except ValueError as error:
+        parser.exit(status=1, message=f"{error}\n")
     if args.question:
         print(chatbot.answer_question(args.question, top_k=args.top_k))
         return 0
