@@ -133,7 +133,7 @@ class KeywordRetriever:
         dot_product = sum(left_vector[term] * right_vector[term] for term in shared_terms)
         return dot_product / (left_norm * right_norm)
 
-    def search(self, question: str, top_k: int = 3) -> list[RetrievedChunk]:
+    def search(self, question: str, top_k: int = 1) -> list[RetrievedChunk]:
         question_vector = self._weight_vector(Counter(tokenize(question)))
         question_norm = self._norm(question_vector)
         ranked_chunks = sorted(
@@ -169,7 +169,7 @@ class FaissRetriever:
         self._index = faiss.IndexFlatIP(embeddings.shape[1])
         self._index.add(embeddings)
 
-    def search(self, question: str, top_k: int = 3) -> list[RetrievedChunk]:
+    def search(self, question: str, top_k: int = 1) -> list[RetrievedChunk]:
         question_embedding = self._embedder.encode(
             [question],
             convert_to_numpy=True,
@@ -224,9 +224,10 @@ class FAQRAGChatbot:
         self._history_path = history_path
         self._chunks = load_corpus(corpus_dir)
         self._retriever, retriever_mode = self._build_retriever(embedding_model_name)
-        self._generator, self.runtime_mode = self._build_generator(
+        self._generator, final_runtime_mode = self._build_generator(
             generation_model_name, retriever_mode
         )
+        self.runtime_mode = final_runtime_mode
 
     def _build_retriever(
         self, embedding_model_name: str
