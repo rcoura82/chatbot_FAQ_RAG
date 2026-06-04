@@ -3,16 +3,31 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import re
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
 
 
-BASE_DIR = Path(__file__).resolve().parent
+def get_base_dir() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(getattr(sys, "_MEIPASS", Path(sys.executable).resolve().parent))
+    return Path(__file__).resolve().parent
+
+
+def get_default_history_path() -> Path:
+    custom_home = os.getenv("CHATBOT_FAQ_RAG_HOME")
+    if custom_home:
+        return Path(custom_home).expanduser() / "chat_history.jsonl"
+    return Path.home() / ".chatbot_faq_rag" / "chat_history.jsonl"
+
+
+BASE_DIR = get_base_dir()
 DEFAULT_CORPUS_DIR = BASE_DIR / "data"
-DEFAULT_HISTORY_PATH = BASE_DIR / "chat_history.jsonl"
+DEFAULT_HISTORY_PATH = get_default_history_path()
 TOKEN_PATTERN = re.compile(r"\w+", re.UNICODE)
 # Limita a geração a algo próximo de 2 ou 3 frases, mantendo respostas objetivas no terminal.
 MAX_NEW_TOKENS = 128
