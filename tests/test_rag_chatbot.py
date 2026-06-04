@@ -1,12 +1,47 @@
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
-from rag_chatbot import FAQRAGChatbot, KeywordRetriever, build_prompt, load_corpus
+import rag_chatbot
+from rag_chatbot import (
+    FAQRAGChatbot,
+    KeywordRetriever,
+    build_prompt,
+    get_base_dir,
+    get_default_history_path,
+    load_corpus,
+)
 
 
 class RagChatbotTests(unittest.TestCase):
+    def test_get_default_history_path_uses_custom_home(self) -> None:
+        with patch.dict("os.environ", {"CHATBOT_FAQ_RAG_HOME": "/tmp/custom-home"}):
+            history_path = get_default_history_path()
+
+        self.assertEqual(Path("/tmp/custom-home/chat_history.jsonl"), history_path)
+
+    def test_get_default_history_path_uses_user_home_by_default(self) -> None:
+        with patch.dict("os.environ", {}, clear=True):
+            with patch("rag_chatbot.Path.home", return_value=Path("/tmp/user-home")):
+                history_path = get_default_history_path()
+
+        self.assertEqual(Path("/tmp/user-home/.chatbot_faq_rag/chat_history.jsonl"), history_path)
+
+    def test_get_base_dir_prefers_meipass_when_frozen(self) -> None:
+        with patch.object(rag_chatbot.sys, "frozen", True, create=True):
+            with patch.object(rag_chatbot.sys, "_MEIPASS", "/tmp/pyinstaller-meipass", create=True):
+                base_dir = get_base_dir()
+
+        self.assertEqual(Path("/tmp/pyinstaller-meipass"), base_dir)
+
+    def test_get_base_dir_uses_project_directory_when_not_frozen(self) -> None:
+        with patch.object(rag_chatbot.sys, "frozen", False, create=True):
+            base_dir = get_base_dir()
+
+        self.assertEqual(Path(rag_chatbot.__file__).resolve().parent, base_dir)
+
     def test_load_corpus_splits_paragraphs_into_chunks(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             corpus_dir = Path(temp_dir)
