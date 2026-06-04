@@ -14,8 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent
 DEFAULT_CORPUS_DIR = BASE_DIR / "data"
 DEFAULT_HISTORY_PATH = BASE_DIR / "chat_history.jsonl"
 TOKEN_PATTERN = re.compile(r"\w+", re.UNICODE)
+# Mantém as respostas curtas e objetivas para um FAQ de terminal.
 MAX_NEW_TOKENS = 128
+# Inclui apenas contextos com pelo menos 80% da pontuação do melhor resultado.
 SIMILARITY_THRESHOLD_RATIO = 0.8
+MIN_VALID_SCORE = 0.0
 STOPWORDS = {
     "a",
     "ao",
@@ -261,7 +264,7 @@ class FAQRAGChatbot:
     def _filter_contexts(contexts: Sequence[RetrievedChunk]) -> list[RetrievedChunk]:
         if not contexts:
             return []
-        if len(contexts) == 1 or contexts[0].score <= 0:
+        if len(contexts) == 1 or contexts[0].score <= MIN_VALID_SCORE:
             return list(contexts)
         threshold = contexts[0].score * SIMILARITY_THRESHOLD_RATIO
         filtered_contexts = [chunk for chunk in contexts if chunk.score >= threshold]

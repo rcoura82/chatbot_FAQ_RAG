@@ -40,6 +40,7 @@ class RagChatbotTests(unittest.TestCase):
             answer = chatbot.answer_question("Quais comidas típicas encontro nas festas?")
 
             self.assertIn("Fontes consultadas", answer)
+            self.assertIn("canjica", answer)
             self.assertIn("dicas_visitante.txt", answer)
             self.assertNotIn("agenda_centro.txt", answer)
             history_entry = json.loads(history_path.read_text(encoding="utf-8").strip())
