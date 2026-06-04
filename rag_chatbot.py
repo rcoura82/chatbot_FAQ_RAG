@@ -256,7 +256,9 @@ class FAQRAGChatbot:
 
     @staticmethod
     def _filter_contexts(contexts: Sequence[RetrievedChunk]) -> list[RetrievedChunk]:
-        if len(contexts) < 2 or contexts[0].score <= 0:
+        if not contexts:
+            return []
+        if len(contexts) == 1 or contexts[0].score <= 0:
             return list(contexts)
         threshold = contexts[0].score * 0.8
         filtered_contexts = [chunk for chunk in contexts if chunk.score >= threshold]
