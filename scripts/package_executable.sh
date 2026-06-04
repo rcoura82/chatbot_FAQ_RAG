@@ -50,7 +50,16 @@ Observações:
 - O executável deve ser gerado no mesmo sistema operacional de destino.
 EOF
 
-ZIP_NAME="faq_rag_chatbot_package_$(uname -s | tr '[:upper:]' '[:lower:]').zip"
+PLATFORM_NAME="windows"
+if [[ "${OS:-}" != "Windows_NT" ]]; then
+  if command -v uname >/dev/null 2>&1; then
+    PLATFORM_NAME="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  else
+    PLATFORM_NAME="unknown"
+  fi
+fi
+
+ZIP_NAME="faq_rag_chatbot_package_${PLATFORM_NAME}.zip"
 (
   cd "${DIST_DIR}"
   rm -f "${ZIP_NAME}"

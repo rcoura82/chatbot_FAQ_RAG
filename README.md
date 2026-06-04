@@ -50,9 +50,9 @@ Digite `sair` para encerrar a conversa.
 1. No projeto:
 
    ```bash
-   cd /tmp/workspace/rcoura82/chatbot_FAQ_RAG
-   chmod +x /tmp/workspace/rcoura82/chatbot_FAQ_RAG/scripts/package_executable.sh
-   /tmp/workspace/rcoura82/chatbot_FAQ_RAG/scripts/package_executable.sh
+   cd <diretorio-do-projeto>
+   chmod +x scripts/package_executable.sh
+   ./scripts/package_executable.sh
    ```
 
 2. Artefatos gerados:
@@ -69,12 +69,12 @@ Digite `sair` para encerrar a conversa.
 Para preparar documentos prontos para upload:
 
 ```bash
-cd /tmp/workspace/rcoura82/chatbot_FAQ_RAG
-python /tmp/workspace/rcoura82/chatbot_FAQ_RAG/scripts/prepare_notebooklm_sources.py
+cd <diretorio-do-projeto>
+python scripts/prepare_notebooklm_sources.py
 ```
 
 Saída:
-- Pasta `/tmp/workspace/rcoura82/chatbot_FAQ_RAG/notebooklm_sources/` com arquivos `.md` derivados de `data/*.txt`
+- Pasta `notebooklm_sources/` com arquivos `.md` derivados de `data/*.txt`
 - `README.md` com índice dos arquivos gerados
 
 ## Limitação do NotebookLM
