@@ -16,9 +16,9 @@ endobj
 stream
 BT
 /F1 12 Tf
-1 0 0 1 50 800 Tm (Relatorio Final de Entrega do Projeto) Tj
+1 0 0 1 50 800 Tm (Relatório Final de Entrega do Projeto) Tj
 1 0 0 1 50 778 Tm () Tj
-1 0 0 1 50 756 Tm (Repositorio GitHub:) Tj
+1 0 0 1 50 756 Tm (Repositório GitHub:) Tj
 1 0 0 1 50 734 Tm (https://github.com/rcoura82/chatbot_FAQ_RAG) Tj
 1 0 0 1 50 712 Tm () Tj
 1 0 0 1 50 690 Tm (Script para preparar fontes do NotebookLM:) Tj
@@ -27,7 +27,7 @@ BT
 1 0 0 1 50 624 Tm () Tj
 1 0 0 1 50 602 Tm (Resultado esperado:) Tj
 1 0 0 1 50 580 Tm (- Pasta notebooklm_sources/ com arquivos .md prontos para upload) Tj
-1 0 0 1 50 558 Tm (- Arquivo notebooklm_sources/README.md com indice das fontes) Tj
+1 0 0 1 50 558 Tm (- Arquivo notebooklm_sources/README.md com índice das fontes) Tj
 ET
 endstream
 endobj
