@@ -14,6 +14,8 @@ BASE_DIR = Path(__file__).resolve().parent
 DEFAULT_CORPUS_DIR = BASE_DIR / "data"
 DEFAULT_HISTORY_PATH = BASE_DIR / "chat_history.jsonl"
 TOKEN_PATTERN = re.compile(r"\w+", re.UNICODE)
+MAX_NEW_TOKENS = 128
+SIMILARITY_THRESHOLD_RATIO = 0.8
 STOPWORDS = {
     "a",
     "ao",
@@ -206,7 +208,7 @@ class HuggingFaceGenerator:
         if not contexts:
             return "Não encontrei essa informação no guia de festas juninas do RJ."
         prompt = build_prompt(question, contexts)
-        result = self._pipeline(prompt, max_new_tokens=128, do_sample=False)
+        result = self._pipeline(prompt, max_new_tokens=MAX_NEW_TOKENS, do_sample=False)
         return result[0]["generated_text"].strip()
 
 
@@ -260,7 +262,7 @@ class FAQRAGChatbot:
             return []
         if len(contexts) == 1 or contexts[0].score <= 0:
             return list(contexts)
-        threshold = contexts[0].score * 0.8
+        threshold = contexts[0].score * SIMILARITY_THRESHOLD_RATIO
         filtered_contexts = [chunk for chunk in contexts if chunk.score >= threshold]
         return filtered_contexts or [contexts[0]]
 
@@ -275,7 +277,13 @@ class FAQRAGChatbot:
 def build_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Chatbot de FAQ com RAG simples.")
     parser.add_argument("--question", help="Pergunta única para o chatbot.")
-    parser.add_argument("--top-k", type=int, default=1, help="Quantidade de trechos recuperados.")
+    parser.add_argument(
+        "--top-k",
+        dest="top_k",
+        type=int,
+        default=1,
+        help="Quantidade de trechos recuperados.",
+    )
     parser.add_argument(
         "--corpus-dir",
         type=Path,

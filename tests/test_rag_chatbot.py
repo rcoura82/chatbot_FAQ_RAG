@@ -46,12 +46,9 @@ class RagChatbotTests(unittest.TestCase):
             self.assertEqual("Quais comidas típicas encontro nas festas?", history_entry["question"])
 
     def test_build_prompt_includes_contexts_and_question(self) -> None:
-        prompt = build_prompt(
-            "Qual é o horário?",
-            retriever_contexts := KeywordRetriever(
-                load_corpus(Path(__file__).resolve().parents[1] / "data")
-            ).search("horário Praça XV", top_k=1),
-        )
+        retriever = KeywordRetriever(load_corpus(Path(__file__).resolve().parents[1] / "data"))
+        retriever_contexts = retriever.search("horário Praça XV", top_k=1)
+        prompt = build_prompt("Qual é o horário?", retriever_contexts)
 
         self.assertIn("Qual é o horário?", prompt)
         self.assertIn(retriever_contexts[0].content, prompt)
