@@ -4,18 +4,18 @@ Chatbot de Perguntas Frequentes usando RAG simples com documentos locais sobre o
 
 ## O que foi implementado
 
-- Corpus local em `/tmp/workspace/rcoura82/chatbot_FAQ_RAG/data` com arquivos `.txt`
+- Corpus local em `data/` com arquivos `.txt`
 - Pipeline RAG com:
   - indexação vetorial com `FAISS` + `sentence-transformers/all-MiniLM-L6-v2` quando as dependências estão instaladas
   - fallback local por palavras-chave para permitir execução básica sem downloads
   - geração de resposta com `google/flan-t5-base` quando disponível
-- Interface de terminal em `/tmp/workspace/rcoura82/chatbot_FAQ_RAG/rag_chatbot.py`
+- Interface de terminal em `rag_chatbot.py`
 - Histórico de perguntas e respostas em `chat_history.jsonl`
 
 ## Instalação
 
 ```bash
-cd /tmp/workspace/rcoura82/chatbot_FAQ_RAG
+cd <diretorio-do-projeto>
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

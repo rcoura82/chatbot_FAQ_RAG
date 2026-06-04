@@ -221,25 +221,29 @@ class FAQRAGChatbot:
         self._corpus_dir = corpus_dir
         self._history_path = history_path
         self._chunks = load_corpus(corpus_dir)
-        self.runtime_mode = "fallback"
-        self._retriever = self._build_retriever(embedding_model_name)
-        self._generator = self._build_generator(generation_model_name)
+        self._retriever, retriever_mode = self._build_retriever(embedding_model_name)
+        self._generator, self.runtime_mode = self._build_generator(
+            generation_model_name, retriever_mode
+        )
 
-    def _build_retriever(self, embedding_model_name: str) -> KeywordRetriever | FaissRetriever:
+    def _build_retriever(
+        self, embedding_model_name: str
+    ) -> tuple[KeywordRetriever | FaissRetriever, str]:
         try:
             retriever = FaissRetriever(self._chunks, embedding_model_name)
-            self.runtime_mode = "huggingface+faiss"
-            return retriever
-        except Exception:
-            return KeywordRetriever(self._chunks)
+            return retriever, "huggingface+faiss"
+        except (ImportError, OSError, RuntimeError, ValueError):
+            return KeywordRetriever(self._chunks), "fallback"
 
-    def _build_generator(self, generation_model_name: str) -> TemplateGenerator | HuggingFaceGenerator:
-        if self.runtime_mode == "huggingface+faiss":
+    def _build_generator(
+        self, generation_model_name: str, runtime_mode: str
+    ) -> tuple[TemplateGenerator | HuggingFaceGenerator, str]:
+        if runtime_mode == "huggingface+faiss":
             try:
-                return HuggingFaceGenerator(generation_model_name)
-            except Exception:
-                self.runtime_mode = "fallback"
-        return TemplateGenerator()
+                return HuggingFaceGenerator(generation_model_name), runtime_mode
+            except (ImportError, OSError, RuntimeError, ValueError):
+                return TemplateGenerator(), "fallback"
+        return TemplateGenerator(), runtime_mode
 
     def answer_question(self, question: str, top_k: int = 1) -> str:
         contexts = self._filter_contexts(self._retriever.search(question, top_k=top_k))
